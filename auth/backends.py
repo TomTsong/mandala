@@ -44,7 +44,7 @@ class ModelBackend:
         return Permission.objects.filter(**{user_roles_query: user_obj})
 
     def _get_group_permissions(self, user_obj):
-        return self._get_role_permissions()
+        return self._get_role_permissions(user_obj)
 
     def _get_permissions(self, user_obj, obj, from_name):
         """
@@ -65,6 +65,13 @@ class ModelBackend:
             setattr(user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms})
         return getattr(user_obj, perm_cache_name)
 
+    def get_user_permissions(self, user_obj, obj=None):
+        """
+        Return a set of permission strings the user `user_obj` has from their
+        `user_permissions`.
+        """
+        return self._get_permissions(user_obj, obj, 'user')
+
     def get_role_permissions(self, user_obj, obj=None):
         """
         Return a set of permission strings the user `user_obj` has from the
@@ -77,7 +84,7 @@ class ModelBackend:
         Return a set of permission strings the user `user_obj` has from the
         groups they belong.
         """
-        return self._get_role_permissions(user_obj, obj)
+        return self.get_role_permissions(user_obj, obj)
 
     def get_all_permissions(self, user_obj, obj=None):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:

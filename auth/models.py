@@ -1,4 +1,5 @@
 # from django.contrib import auth
+from mandala import auth
 # from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from mandala.auth.base_user import AbstractBaseUser, BaseUserManager
 # from django.contrib.contenttypes.models import ContentType
@@ -11,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 
 from mandala.auth.validators import UnicodeUsernameValidator
 
-# app_label = "auth"
 
 class AbstractBaseModel(models.Model):
     # 名称
@@ -40,9 +40,9 @@ class Module(AbstractBaseModel):
     # 链接
     url = models.CharField(_('url'), blank=True, null=True, max_length=255)
     # 父级模块
-    parent = models.ForeignKey("self", verbose_name="父模块", blank=True, null=True, on_delete=models.DO_NOTHING)
+    parent = models.ForeignKey("self", related_name='children', verbose_name=_("parent"), blank=True, null=True, on_delete=models.DO_NOTHING)
     # # 用户查看此模块需要拥有的权限
-    # perms = models.ManyToManyField('Permission', verbose_name="权限", blank=True, null=True)
+    # perms = models.ManyToManyField('Permission', verbose_name=_("permissions"), blank=True, null=True)
 
     class Meta:
         # app_label = app_label
@@ -82,7 +82,7 @@ class PermissionManager(models.Manager):
 
 class Permission(AbstractBaseModel):
     # 属于哪个模块
-    module = models.ForeignKey(Module, verbose_name="模块", blank=True, null=True, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, related_name="permissions", verbose_name=_("module"), blank=True, null=True, on_delete=models.CASCADE)
 
     objects = PermissionManager()
 
