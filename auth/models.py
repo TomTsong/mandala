@@ -40,7 +40,7 @@ class Module(AbstractBaseModel):
     # 链接
     url = models.CharField(_('url'), blank=True, null=True, max_length=255)
     # 父级模块
-    parent = models.ForeignKey("self", related_name='children', verbose_name=_("parent"), blank=True, null=True, on_delete=models.DO_NOTHING)
+    parent = models.ForeignKey("self", related_name='children', verbose_name=_("parent"), blank=True, null=True, on_delete=models.CASCADE)
     # # 用户查看此模块需要拥有的权限
     # perms = models.ManyToManyField('Permission', verbose_name=_("permissions"), blank=True, null=True)
 
@@ -121,6 +121,8 @@ class Role(AbstractBaseModel):
     permissions = models.ManyToManyField(
         Permission,
         verbose_name=_('permissions'),
+        related_name="roles",
+        related_query_name="role",
         blank=True,
     )
 
@@ -232,7 +234,7 @@ class PermissionsMixin(models.Model):
             'The roles this user belongs to. A user will get all permissions '
             'granted to each of their roles.'
         ),
-        related_name="user_set",
+        related_name="users",
         related_query_name="user",
     )
     user_permissions = models.ManyToManyField(
@@ -240,7 +242,7 @@ class PermissionsMixin(models.Model):
         verbose_name=_('user permissions'),
         blank=True,
         help_text=_('Specific permissions for this user.'),
-        related_name="user_set",
+        related_name="users",
         related_query_name="user",
     )
 

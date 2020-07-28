@@ -36,12 +36,19 @@ class ModelBackend:
         return is_active or is_active is None
 
     def _get_user_permissions(self, user_obj):
-        return user_obj.user_permissions.all()
+        # return user_obj.user_permissions.all()
+        """
+        20200724修改，加入status逻辑
+        """
+        return user_obj.user_permissions.filter(status=1)
 
     def _get_role_permissions(self, user_obj):
         user_roles_field = get_user_model()._meta.get_field('roles')
         user_roles_query = 'role__%s' % user_roles_field.related_query_name()
-        return Permission.objects.filter(**{user_roles_query: user_obj})
+        """
+        20200724修改，加入status逻辑
+        """
+        return Permission.objects.filter(**{user_roles_query: user_obj, "status": 1, "role__status": 1})
 
     def _get_group_permissions(self, user_obj):
         return self._get_role_permissions(user_obj)
